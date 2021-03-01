@@ -34,10 +34,28 @@ const filteredJson: DateResult[] = json.map((data: any) => {
   };
 });
 
+const dayOfWeekMap = new Map([
+  [0, "Sun"],
+  [1, "Mon"],
+  [2, "Tue"],
+  [3, "Wed"],
+  [4, "Thr"],
+  [5, "Fri"],
+  [6, "Sat"],
+]);
+
+// ${dayOfWeekMap.get(new Date(d.id * 1000).getDay())}
 filteredJson.forEach((d) => {
-  const date = Colors.green(`[${d.date}]`);
-  const time = Colors.red(`TIME: ${d.total_duration_formatted}`);
-  const productivity = Colors.blue(`<PRODUCTIVITY: ${d.productivity_pulse}>`);
+  const dayOfWeekNum = new Date(d.id * 1000).getDay();
+  if (dayOfWeekNum === 0 || dayOfWeekNum === 6) return;
+  const date = Colors.green(`[${d.date} (${dayOfWeekMap.get(dayOfWeekNum)})]`);
+  const time = `TIME: ${d.total_duration_formatted}`;
+  const pulse = d.productivity_pulse;
+  const quota = 75;
+  const baseProductivity = `<PRODUCTIVITY: ${pulse}>`;
+  const productivity = pulse > quota
+    ? Colors.blue(baseProductivity)
+    : Colors.red(baseProductivity);
 
   console.log(
     `${date} ${productivity} ${time}`,
