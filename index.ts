@@ -35,9 +35,11 @@ const filteredJson: DateResult[] = json.map((data: any) => {
 });
 
 filteredJson.forEach((d) => {
+  const date = Colors.green(`[${d.date}]`);
+  const time = Colors.red(`TIME: ${d.total_duration_formatted}`);
+  const productivity = Colors.blue(`<PRODUCTIVITY: ${d.productivity_pulse}>`);
+
   console.log(
-    `[${
-      Colors.green(d.date)
-    }] 労働時間: ${d.total_duration_formatted} 生産性: ${d.productivity_pulse}`,
+    `${date} ${productivity} ${time}`,
   );
 });
