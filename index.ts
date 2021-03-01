@@ -9,7 +9,7 @@ type DateResult = {
   total_duration_formatted: string;
 };
 
-const key = config().API_KEY;
+const key = config({ safe: true}).API_KEY;
 const url = "https://www.rescuetime.com/anapi/daily_summary_feed";
 const queryParams = new URLSearchParams({ key });
 
