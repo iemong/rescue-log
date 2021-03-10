@@ -58,6 +58,6 @@ filteredJson.forEach((d) => {
     : Colors.red(baseProductivity);
 
   console.log(
-    `${date} ${productivity} ${time}`,
+    `${date} : ${productivity} : ${time}`,
   );
 });
