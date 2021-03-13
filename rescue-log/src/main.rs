@@ -1,13 +1,22 @@
-use rand::Rng;
+use reqwest;
+use error_chain::error_chain;
+use std::io::Read;
 
-fn main() {
-    let mut rng = rand::thread_rng();
+error_chain! {
+    foreign_links {
+        Io(std::io::Error);
+        HttpRequest(reqwest::Error);
+    }
+}
 
-    let n1: u8 = rng.gen();
-    let n2: u16 = rng.gen();
-    println!("Random u8: {}", n1);
-    println!("Random u16: {}", n2);
-    println!("Random u32: {}", rng.gen::<u32>());
-    println!("Random i32: {}", rng.gen::<i32>());
-    println!("Random float: {}", rng.gen::<f64>());
+fn main() -> Result<()> {
+    let mut res = reqwest::blocking::get("http://httpbin.org/get")?;
+    let mut body = String::new();
+    res.read_to_string(&mut body)?;
+
+    println!("Status: {}", res.status());
+    println!("Headers:\n{:#?}", res.headers());
+    println!("Body:\n{}", body);
+
+    Ok(())
 }
