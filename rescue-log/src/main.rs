@@ -22,7 +22,6 @@ async fn main() -> Result<(), reqwest::Error> {
         "https://www.rescuetime.com/anapi/daily_summary_feed?key={token}",
         token = token
     );
-    println!("{}", url);
     let res = reqwest::get(url).await?;
     // println!("Status: {}", res.status());
     // println!("Headers:\n{:#?}", res.headers());
