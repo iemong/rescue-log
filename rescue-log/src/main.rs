@@ -1,22 +1,52 @@
-use reqwest;
-use error_chain::error_chain;
-use std::io::Read;
+extern crate dotenv;
 
-error_chain! {
-    foreign_links {
-        Io(std::io::Error);
-        HttpRequest(reqwest::Error);
-    }
+use colored::{ColoredString, Colorize};
+use reqwest;
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct RescueLog {
+    id: i32,
+    date: String,
+    productivity_pulse: u8,
+    total_hours: f32,
+    total_duration_formatted: String,
 }
 
-fn main() -> Result<()> {
-    let mut res = reqwest::blocking::get("http://httpbin.org/get")?;
-    let mut body = String::new();
-    res.read_to_string(&mut body)?;
+#[tokio::main]
+async fn main() -> Result<(), reqwest::Error> {
+    let key = "API_KEY";
+    let token = dotenv::var(key).unwrap();
 
-    println!("Status: {}", res.status());
-    println!("Headers:\n{:#?}", res.headers());
-    println!("Body:\n{}", body);
+    let url = format!(
+        "https://www.rescuetime.com/anapi/daily_summary_feed?key={token}",
+        token = token
+    );
+    println!("{}", url);
+    let res = reqwest::get(url).await?;
+    // println!("Status: {}", res.status());
+    // println!("Headers:\n{:#?}", res.headers());
 
+    let logs: Vec<RescueLog> = res.json().await?;
+
+    for i in logs {
+        let colored_productivity = paint_by_ratio(i.productivity_pulse);
+        println!(
+            "[日付: {}] <生産性: {}> 労働時間: {}",
+            i.date, colored_productivity, i.total_duration_formatted
+        );
+    }
     Ok(())
+}
+
+fn u82string(num: u8) -> String {
+    num.to_string()
+}
+
+fn paint_by_ratio(ratio: u8) -> ColoredString {
+    if ratio > 75 {
+        (&*u82string(ratio)).blue()
+    } else {
+        (&*u82string(ratio)).red()
+    }
 }
